@@ -112,7 +112,7 @@ public class KeepAliveService extends Service {
         //注释部分是可扩展的参数，根据自己的功能需求添加
         //可参考：https://www.cnblogs.com/stars-one/p/8371051.html
         return new NotificationCompat.Builder(this,channelId)
-                .setContentTitle("咖啡杯助手")
+                .setContentTitle("剑荡江湖助手")
                 .setContentText("运行中...")
                 .setSmallIcon(R.mipmap.index)//通知显示的图标
                 .setContentIntent(pendingIntent)//点击通知进入Activity

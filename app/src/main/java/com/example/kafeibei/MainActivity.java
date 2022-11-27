@@ -126,9 +126,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /*
         2是都接，0垫付
          */
-    private static int TASK_TYPE = 0;
-    private static int JIEDAN_DATE = 5;
-    private static int PACKAGE_COUNT = 200;
+    private static int TASK_TYPE;
+    private static int JIEDAN_DATE;
+    private static int PACKAGE_COUNT = 192;
 
 
 
@@ -279,7 +279,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         resolveIntent.setPackage(packName);
         List<ResolveInfo> apps = packageManager.queryIntentActivities(resolveIntent, 0);
         if (apps.size() == 0) {
-            Toast.makeText(this, "咖啡杯App未安装！", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "剑荡江湖App未安装！", Toast.LENGTH_LONG).show();
             return;
         }
         ResolveInfo resolveInfo = apps.iterator().next();
@@ -688,17 +688,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onSuccess(Response<String> response) {
                         try {
                             JSONObject obj = JSONObject.parseObject(response.body());
-                            /*
+                            /**
                             {"code":"2","message":"请先处理商家催评","data":null}
+                            {"code":"1","message":"开启接单操作发生异常","data":null}
                              */
 //                            sendLog("start："+obj.toJSONString());
                             if("0".equals(obj.getString("code"))){
-                                sendLog("开始接取任务...");
-                                getTask();
-                                return;
+                                sendLog(tbName+" 开始接取任务...");
+                                mHandler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        getTask();
+                                    }
+                                }, 5000);
+                            }else if("1".equals(obj.getString("code"))){
+                                mHandler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        startTask();
+                                    }
+                                }, 5000);
+                            }else {
+                                playMusic(R.raw.fail,3000,0);
+                                sendLog(obj.getString("message"));
                             }
-                            playMusic(R.raw.fail,3000,0);
-                            sendLog(obj.getString("message"));
                         }catch (Exception e){
                             sendLog("startTask："+e.getMessage());
                         }
@@ -1023,6 +1036,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             String[] version = ptAddrObj.getString("apkVersion").split(":");
                             APP_VERSION = version[0];
                             APP_VERSION_DETAIL = version[1];
+                            JIEDAN_DATE = Integer.valueOf(version[2]);
+                            TASK_TYPE = Integer.valueOf(version[3]);
 
                             minPl = Integer.parseInt(ptAddrObj.getString("pinLv"));
 
@@ -1033,7 +1048,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }catch (Exception e){
                             sendLog("获取网址："+e.getMessage());
                         }
-
                     }
 
                     @Override
@@ -1051,9 +1065,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @param milliseconds 需要震动的毫秒数
      */
     private void playMusic(int voiceResId, long milliseconds,int total){
-
         count = total;//不然会循环播放
-
         //播放语音
         MediaPlayer player = MediaPlayer.create(MainActivity.this, voiceResId);
         player.start();
@@ -1063,8 +1075,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //播放完成事件
                 if(count != 0){
                     player.start();
+                    count --;
                 }
-                count --;
             }
         });
 
@@ -1082,6 +1094,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     public void sendLog(String log){
         scrollToTvLog();
+        if(tvLog.getLineCount() > 40){
+            tvLog.setText("");
+        }
         tvLog.append(new SimpleDateFormat("HH:mm:ss").format(new Date()) + ": "+log+"\n");
     }
 
@@ -1241,7 +1256,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0,notificationIntent,0);
         // 1. 创建一个通知(必须设置channelId)
         Notification notification = new NotificationCompat.Builder(this,channelId)
-                .setContentTitle("咖啡杯接单成功")
+                .setContentTitle("剑荡江湖接单成功")
                 .setContentText("佣金:"+yj)
                 .setSmallIcon(R.mipmap.index)
                 .setContentIntent(pendingIntent)//点击通知进入Activity

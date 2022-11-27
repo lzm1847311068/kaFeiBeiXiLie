@@ -30,7 +30,7 @@ android {
     applicationVariants.all{ variant->
         variant.outputs.all { output->
             if(variant.buildType.name.equals('release')){
-                outputFileName = "咖啡杯助手v" + defaultConfig.versionName + ".apk"
+                outputFileName = "剑荡江湖助手v" + defaultConfig.versionName + ".apk"
             }
             if(variant.buildType.name.equals('beta')){
 

@@ -14,7 +14,7 @@
         android:layout_height="55dp"
         android:gravity="center"
         android:textSize="20sp"
-        android:text="咖啡杯助手"
+        android:text="剑荡江湖助手"
         android:textColor="#ffffffff"
         android:background="#ff9900"/>
 
